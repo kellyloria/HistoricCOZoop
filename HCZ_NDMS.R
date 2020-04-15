@@ -11,10 +11,10 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(tidyverse)
-library(zoo)
 library(vegan)
 library(ape)
 library(devtools)
+library(sp)
 ## ---------------------------
 # File path setup:
 #if (dir.exists('~/Users/kellyloria/Documents/Publications/Historical_Limno')){
@@ -145,5 +145,40 @@ ef
 plot(NMDS3, type = "t", display = "sites")
 plot(ef, p.max = 0.05)
 text(NMDS3, display ="species")
+
+## ---------------------------
+# IV. Play around with mantel tests
+
+# lat long distance for visit 1
+coords <- phy[, c("lat", "long", "Lake.Name")]
+names(coords) <- c("lat", "long", "site")
+s.coord <- coordinates(coords[, c("long", "lat")])
+dis_v1 <- dist(s.coord[, c("long", "lat")], method = "euclidean") 
+max(dis_v1)
+min(dis_v1)
+
+# Lat Long and Elevation distance for 1 visit to visualize 
+xcood1 <- phy$lat
+ycood1 <- phy$long
+elev1 <- phy$Elevation..m.
+dat2 <- cbind(xcood1, ycood1, elev1)
+
+elev_dis1 <- dist(dat2)
+max(elev_dis1)
+min(elev_dis1)
+
+# plot the lat long distance v. sp. distance
+# dist from earlier cod chunk 
+plot(c(dis_v1), c(dist), # where dis_v3 = spatial matrix and hjac = species dissim matrix,
+     main="Zoop dissimilarity decay (lat and long)",cex.lab=1.6, cex.axis=1.4, cex.main=1.8)
+abline(lm(dist ~ dis_v1))
+mantel(dis_v1, dist) 
+
+# plot the elevation distance v. sp. distance
+# dist from earlier cod chunk 
+plot(c(elev_dis1), c(dist), # where dis_v3 = spatial matrix and hjac = species dissim matrix,
+     main="Zoop dissimilarity decay (elevation)",cex.lab=1.6, cex.axis=1.4, cex.main=1.8)
+abline(lm(dist ~ elev_dis1))
+mantel(elev_dis1, dist) # elevation not significant  
 
 
